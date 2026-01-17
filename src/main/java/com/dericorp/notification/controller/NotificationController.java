@@ -2,6 +2,9 @@ package com.dericorp.notification.controller;
 
 import com.dericorp.notification.service.NotificationService;
 import jakarta.mail.MessagingException;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +23,11 @@ public class NotificationController {
     NotificationService notificationService;
 
     @PostMapping("/send-email")
-    public String createIssue(@RequestBody String body) throws MessagingException {
+    public String createIssue(@RequestBody Map<String, Object> body) {
 
-        notificationService.sendEmail("derickdaniel44@gmail.com", "test-notification", body);
+    	body.forEach((k, v) -> System.out.println(k +" : " + v));
+    	
+        notificationService.sendEmailUsingFreeMarker(body);
 
         return "success";
     }

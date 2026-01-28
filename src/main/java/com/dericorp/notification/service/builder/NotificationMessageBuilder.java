@@ -3,7 +3,6 @@ package com.dericorp.notification.service.builder;
 import com.dericorp.notification.dto.NotificationRequest;
 import org.springframework.stereotype.Service;
 
-@Service
 public class NotificationMessageBuilder {
 
     private static final String APP_NAME = "Developer Issue Book";
@@ -25,7 +24,7 @@ public class NotificationMessageBuilder {
         }
     }
 
-    public String buildMessage(NotificationRequest req) {
+    public static String buildMessage(NotificationRequest req) {
         String actionMessage;
 
         switch (req.getAction()) {

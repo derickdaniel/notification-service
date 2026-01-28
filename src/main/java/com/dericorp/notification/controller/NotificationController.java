@@ -26,7 +26,6 @@ public class NotificationController {
 
     @Autowired
     NotificationService notificationService;
-    private final NotificationMessageBuilder messageBuilder;
 
     @PostMapping("/send-email")
     public String createIssue(@RequestBody Map<String, Object> body) {
@@ -42,8 +41,8 @@ public class NotificationController {
     public ResponseEntity<String> notifyAction(
             @RequestBody NotificationRequest request) throws MessagingException {
 
-        String subject = messageBuilder.buildSubject(request);
-        String body = messageBuilder.buildMessage(request);
+        String subject = NotificationMessageBuilder.buildSubject(request);
+        String body = NotificationMessageBuilder.buildMessage(request);
 
         notificationService.sendEmail(
                 request.getEmail(),

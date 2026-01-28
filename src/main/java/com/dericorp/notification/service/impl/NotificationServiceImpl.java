@@ -39,7 +39,7 @@ public class NotificationServiceImpl implements NotificationService {
 		mailSender.send(message);
 	}
 
-	@Override
+	/*@Override
 	public void sendEmail(String to, String subject, String body) throws MessagingException {
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
@@ -47,7 +47,7 @@ public class NotificationServiceImpl implements NotificationService {
 		helper.setSubject(subject);
 		helper.setText(body, true);
 		mailSender.send(message);
-	}
+	}*/
 
 	@Override
 	public void sendEmailUsingFreeMarker(Map<String, Object> templateModel) {
@@ -58,7 +58,8 @@ public class NotificationServiceImpl implements NotificationService {
 
 			MimeMessage message = mailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
-			helper.setTo("derickdaniel44@gmail.com");
+			//helper.setTo("derickdaniel44@gmail.com");
+            helper.setTo("rajniminj96@gmail.com");
 			helper.setSubject("Your Developer Book has been updated!!");
 			helper.setText(htmlBody, true);
 			mailSender.send(message);
@@ -67,4 +68,14 @@ public class NotificationServiceImpl implements NotificationService {
 			e.printStackTrace();
 		}
 	}
+
+    @Override
+    public void sendEmail(String to, String subject, String body) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
+        mailSender.send(message);
+    }
 }

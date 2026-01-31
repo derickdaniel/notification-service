@@ -3,9 +3,12 @@ package com.dericorp.notification.service.impl;
 import java.io.IOException;
 import java.util.Map;
 
+import com.dericorp.notification.exception.NotificationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -23,21 +26,21 @@ import jakarta.mail.internet.MimeMessage;
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
-	Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
-	@Autowired
-	private JavaMailSender mailSender;
+    @Autowired
+    private JavaMailSender mailSender;
 
-	@Autowired
-	private FreeMarkerConfigurer freemarkerConfigurer;
+    @Autowired
+    private FreeMarkerConfigurer freemarkerConfigurer;
 
-	public void sendPlainText(String to, String subject, String body) {
-		SimpleMailMessage message = new SimpleMailMessage();
-		message.setTo(to);
-		message.setSubject(subject);
-		message.setText(body);
-		mailSender.send(message);
-	}
+    public void sendPlainText(String to, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
+        mailSender.send(message);
+    }
 
 	/*@Override
 	public void sendEmail(String to, String subject, String body) throws MessagingException {
@@ -49,25 +52,26 @@ public class NotificationServiceImpl implements NotificationService {
 		mailSender.send(message);
 	}*/
 
-	@Override
-	public void sendEmailUsingFreeMarker(Map<String, Object> templateModel) {
-		try {
-			
-			Template freemarkerTemplate = freemarkerConfigurer.getConfiguration().getTemplate("notification.ftl");
-			String htmlBody = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerTemplate, templateModel);
+    @Override
+    public void sendEmailUsingFreeMarker(Map<String, Object> templateModel) {
+        try {
 
-			MimeMessage message = mailSender.createMimeMessage();
-			MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
-			//helper.setTo("derickdaniel44@gmail.com");
+            Template freemarkerTemplate = freemarkerConfigurer.getConfiguration().getTemplate("notification.ftl");
+            String htmlBody = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerTemplate, templateModel);
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
+            //helper.setTo("derickdaniel44@gmail.com");
             helper.setTo("rajniminj96@gmail.com");
-			helper.setSubject("Your Developer Book has been updated!!");
-			helper.setText(htmlBody, true);
-			mailSender.send(message);
-		} catch (IOException | TemplateException | MessagingException e) {
-			logger.error("There has been an error sending email", e.getMessage());
-			e.printStackTrace();
-		}
-	}
+            helper.setSubject("Your Developer Book has been updated!!");
+            helper.setText(htmlBody, true);
+            mailSender.send(message);
+        } catch (IOException | TemplateException | MessagingException e) {
+
+            logger.error("Error while sending notification email", e);
+            throw new NotificationException("Email notification failed", e);
+        }
+    }
 
     @Override
     public void sendEmail(String to, String subject, String body) {
@@ -76,6 +80,12 @@ public class NotificationServiceImpl implements NotificationService {
         message.setTo(to);
         message.setSubject(subject);
         message.setText(body);
-        mailSender.send(message);
+        try {
+            mailSender.send(message);
+        } catch (MailException ex) {
+            throw new NotificationException("Email delivery failed", ex);
+        }
+        //throw new NotificationException("Forced test exception", new RuntimeException("Test"));
+
     }
 }
